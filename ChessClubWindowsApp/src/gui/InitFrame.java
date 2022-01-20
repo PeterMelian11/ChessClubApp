@@ -38,11 +38,14 @@ public class InitFrame {
 	 */
 	public InitFrame() {
 		initialize();
-		
 		try {
+			/***Connect to DB and Create Table if it does not exist. If exception occurs throw message back to Label with comment. **/
 			conn = DerbyAccess.connectToDb();
 			DerbyAccess.createDbTable(conn);
 			dbLabelMsg.setText("Connected to embedded Derby Data Base. (Table CHESSPLAYERS)");
+			
+			
+			
 		} catch (Exception e) {
 			dbLabelMsg.setText(e.getMessage());
 		}
@@ -55,9 +58,10 @@ public class InitFrame {
 		
 		frame = new JFrame();
 		frame.addWindowListener(new WindowAdapter() {
+			
+			/**Close db connection on Windows Closing event.***/
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				System.out.println("Closing ..................................");
 				DerbyAccess.closeDb(conn);
 			}
 		});
