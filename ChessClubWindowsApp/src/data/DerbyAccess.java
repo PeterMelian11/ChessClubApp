@@ -3,6 +3,10 @@ package data;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.DriverManager;
@@ -159,6 +163,88 @@ public class DerbyAccess {
 					pStTruncate = null;
 				}catch (Throwable ignore) {}
 			}
+		}
+	}
+	
+	
+	/***
+	 * @author pmelian
+	 * @param conn
+	 * @param name
+	 * @param email
+	 * @param birthDate
+	 * @throws Exception
+	 * @comment 
+	 *         Insert new user into 'CHESSPLAYERS' table.
+	 *         No records in table insert with first rank =1;
+	 *         Validate that email address is unique,if not throw exception.
+	 *         Next user rank , previous user rank +1.
+	 *         
+	 */
+	public static void insertNewUser(Connection conn,String name ,String email,String birthDate) throws Exception {
+		ResultSet rs = null;
+		boolean bNewEntry = true;
+		String insertSql 							= "INSERT INTO CHESSPLAYERS (FullName,EmailAddress,BirthDay,GamesPlayed,Rank) values(?,?,?,?,?)";
+		PreparedStatement  pSt 						= null;
+		List<String> emailAddressList 				= new ArrayList<String>();
+		SortedMap <Integer,Integer>sortedIdRankMap 	= new TreeMap<Integer,Integer>();
+		TreeMap <Integer,Integer>tRankIdMap 		= new TreeMap<Integer,Integer>();
+		try {
+			getAllTableRecords(conn);
+			rs = DerbyAccess.getResListUser();
+			while (rs.next()) {
+				bNewEntry =false;
+				emailAddressList.add(rs.getString("EmailAddress"));
+				sortedIdRankMap.put(rs.getInt("id"), rs.getInt("Rank"));
+				tRankIdMap.put(rs.getInt("Rank"), rs.getInt("id"));
+			}
+		} catch (Exception e) {
+			throw e;
+		}finally {
+			if(rs != null) {
+				try {
+					rs.close();
+					rs =null;
+				} catch (Throwable ignore) {}
+			}
+		}
+		try {
+			pSt = conn.prepareStatement(insertSql);
+			pSt.setString(1, name);
+			pSt.setString(2, email);
+			pSt.setString(3,birthDate);
+			pSt.setInt(4,0);
+			/**We have no records in the data base.**/
+			if(bNewEntry) {
+				pSt.setInt(5,1);
+			}else{
+				if(emailAddressList.contains(email)) {
+					throw new Exception("this email address has already been captured.");
+				}
+				Integer rankV   = tRankIdMap.lastKey();
+				pSt.setInt(5,rankV+1);
+			}
+			pSt.executeUpdate();
+		}catch(SQLException ee) {
+			throw new Exception("Cannot insert item  into table 'CHESSPLAYERS' ," + ee.getMessage());
+		}finally {
+			if(pSt != null) {
+				try {
+					pSt.close();
+					pSt =null;
+				} catch (Throwable ignore) {}
+			}
+		}
+	}
+	
+	private static void getAllTableRecords(Connection conn) throws Exception {
+		cleanUpStaticVar();
+		try {
+			staListUser = conn.createStatement();
+			resListUser = staListUser.executeQuery("SELECT * FROM CHESSPLAYERS ORDER BY Rank ASC");
+		} catch (SQLException e) {
+			throw new Exception("Cannot select items from table 'CHESSPLAYERS' ," + e.getMessage());
+			
 		}
 	}
 

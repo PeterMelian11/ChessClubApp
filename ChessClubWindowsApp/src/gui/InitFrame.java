@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import data.DerbyAccess;
+import helpers.AppHelpers;
 
 import java.sql.Connection;
 import java.awt.event.ActionListener;
@@ -191,6 +192,24 @@ public class InitFrame {
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(frame, e.getMessage());
 				}
+			}
+		});
+		
+		/**Add User event handler**/
+		btnAddUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String name 		= null;
+				String email 		= null;
+				String birthDate 	= null;
+				try {
+					name  = AppHelpers.isStringEmpty("Text Box 'Name And Surname'", (txtAsdas.getText()).toUpperCase());
+					email = AppHelpers.isValidEmailAddress("Text Box 'Email Address'", (txtXxgamilcom.getText()).toLowerCase());
+					birthDate = AppHelpers.validateAndParseBirthDate("Text Box 'Birthday'",textField_BithDate.getText());
+					DerbyAccess.insertNewUser(conn,name,email,birthDate);
+					JOptionPane.showMessageDialog(frame, "User added.");
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(frame, e1.getMessage());
+				} 
 			}
 		});
 		
