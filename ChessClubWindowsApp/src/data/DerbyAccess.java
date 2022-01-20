@@ -104,6 +104,7 @@ public class DerbyAccess {
 		Connection conn				 = null;
 		try {
 			conn = DriverManager.getConnection(JDBC_URL);
+			
 		} catch (SQLException e) {
 			throw new Exception("Failed to connect to embedded Derby Data Base");
 		}
