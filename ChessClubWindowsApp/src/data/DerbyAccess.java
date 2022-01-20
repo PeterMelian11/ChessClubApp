@@ -485,6 +485,8 @@ public class DerbyAccess {
 					 *            e.g:: 
 					 *        		(6-1)/2  = 2.5  .... drop the .5
 					 *              (7-1)/2  = 3    .... no decimal value.
+					 *              
+					 *    Always ensure that players cannot have the same Rank.           
 					 *       
 					 * ***/
 					updatePlayerGamesPalyed(conn,iHigherRankId,iHigherRankGamesPalyed +1);
