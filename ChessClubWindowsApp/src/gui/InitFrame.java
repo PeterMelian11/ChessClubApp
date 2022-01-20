@@ -17,6 +17,8 @@ import javax.swing.JTextField;
 import data.DerbyAccess;
 
 import java.sql.Connection;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class InitFrame {
 
@@ -86,7 +88,6 @@ public class InitFrame {
 		btnButton_List.setBounds(27, 11, 116, 23);
 		frame.getContentPane().add(btnButton_List);
 		
-		
 		scrollPaneListTable = new JScrollPane();
 		scrollPaneListTable.setBounds(27, 40, 554, 335);
 		frame.getContentPane().add(scrollPaneListTable);
@@ -108,7 +109,6 @@ public class InitFrame {
 		textField_BithDate.setColumns(10);
 		textField_BithDate.setBounds(27, 448, 193, 20);
 		frame.getContentPane().add(textField_BithDate);
-		
 		
 		lblNewLabel = new JLabel("Name And Surname");
 		lblNewLabel.setBounds(230, 392, 143, 14);
@@ -166,7 +166,6 @@ public class InitFrame {
 		lblNewLabel_2.setBounds(740, 222, 27, 14);
 		frame.getContentPane().add(lblNewLabel_2);
 		
-		
 		String  [] comboBoxList = {"LOSE","DRAW","WIN"};
 		comboBoxResult = new JComboBox(comboBoxList);
 		comboBoxResult.setBounds(611, 275, 86, 23);
@@ -179,6 +178,22 @@ public class InitFrame {
 		btnNewButton = new JButton("Truncate Table");
 		btnNewButton.setBounds(611, 11, 127, 23);
 		frame.getContentPane().add(btnNewButton);
+		
+		
+		/** Windows Event handlers*/
+		
+		/*** Truncate table ***/
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					DerbyAccess.truncateTable(conn);
+					JOptionPane.showMessageDialog(frame, "Table Truncated.");
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(frame, e.getMessage());
+				}
+			}
+		});
+		
 	}
 
 	/**

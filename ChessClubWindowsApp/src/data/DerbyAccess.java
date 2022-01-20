@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 
 public class DerbyAccess {
 	
@@ -21,19 +22,22 @@ public class DerbyAccess {
 	public static ResultSet getResListUser() 				 {	return resListUser;	}
 	public static void setResListUser(ResultSet resListUser) {	DerbyAccess.resListUser = resListUser;	}
 	
-	public static void cleanUpStaticVar() {
-		if(getStaListUser() != null) {
-			try {
-				getStaListUser().close();
-				setStaListUser(null);
-			} catch (Throwable ignore) {}
+	
+	/**
+	 * @author pmelian
+	 * @return Connection Object
+	 * @throws Exception
+	 * @Comment Open Connection to embedded Derby Data Base.
+	 * 
+	 */
+	public static Connection connectToDb() throws Exception {
+		Connection conn				 = null;
+		try {
+			conn = DriverManager.getConnection(JDBC_URL);
+		} catch (SQLException e) {
+			throw new Exception("Failed to connect to embedded Derby Data Base");
 		}
-		if(getResListUser() != null) {
-			try {
-				getResListUser().close();
-				setResListUser(null);
-			} catch (Throwable ignore) {}
-		}
+		return conn;
 	}
 	
 	/**
@@ -92,25 +96,6 @@ public class DerbyAccess {
 		}
 	}
 	
-	
-	/**
-	 * @author pmelian
-	 * @return Connection Object
-	 * @throws Exception
-	 * @Comment Open Connection to embedded Derby Data Base.
-	 * 
-	 */
-	public static Connection connectToDb() throws Exception {
-		Connection conn				 = null;
-		try {
-			conn = DriverManager.getConnection(JDBC_URL);
-			
-		} catch (SQLException e) {
-			throw new Exception("Failed to connect to embedded Derby Data Base");
-		}
-		return conn;
-	}
-	
 	/**
 	 * @author pmelian
 	 * @param conn 
@@ -124,6 +109,56 @@ public class DerbyAccess {
 				conn.close();
 				conn = null;
 			} catch (Throwable ignore) {}
+		}
+	}
+	
+	/**
+	 * @author pmelian
+	 * @comment
+	 *         clean up static variables that may be in use.
+	 */
+	private static void cleanUpStaticVar() {
+		if(getStaListUser() != null) {
+			try {
+				getStaListUser().close();
+				setStaListUser(null);
+			} catch (Throwable ignore) {}
+		}
+		if(getResListUser() != null) {
+			try {
+				getResListUser().close();
+				setResListUser(null);
+			} catch (Throwable ignore) {}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param conn
+	 * @throws Exception
+	 * @comment
+	 *         truncate table 'CHESSPLAYERS' and reset UNIQUE identity 'ID' back to 1 (int)
+	 */
+	public static void truncateTable(Connection conn) throws Exception {
+		cleanUpStaticVar();
+		PreparedStatement  pStTruncate 					= null;
+		String truncateTableSql 						= "TRUNCATE TABLE CHESSPLAYERS ";
+		String altTableSql 								= "ALTER TABLE CHESSPLAYERS ALTER COLUMN ID RESTART WITH 1 ";
+		try {
+			pStTruncate = conn.prepareStatement(truncateTableSql);
+			pStTruncate.execute();
+			pStTruncate.close();
+			pStTruncate = conn.prepareStatement(altTableSql);
+			pStTruncate.execute();
+		}catch (SQLException x) {
+			throw new Exception("failed to truncate table 'CHESSPLAYERS'," + x.getMessage());
+		}finally {
+			if (pStTruncate != null) {
+				try {
+					pStTruncate.close();
+					pStTruncate = null;
+				}catch (Throwable ignore) {}
+			}
 		}
 	}
 
