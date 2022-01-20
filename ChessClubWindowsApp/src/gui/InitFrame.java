@@ -226,6 +226,20 @@ public class InitFrame {
 			}
 		});
 		
+		/**Delete User event handler**/
+		btnButtonDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int sID;
+				try {
+					sID  = AppHelpers.isInteger("Text Box 'User System Id'", (textField_Delete.getText()).toUpperCase());
+					DerbyAccess.deleteUser(conn,sID);
+					JOptionPane.showMessageDialog(frame, "User deleted.");
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(frame, e1.getMessage());
+				} 
+			}
+		});
+		
 	}
 
 	/**

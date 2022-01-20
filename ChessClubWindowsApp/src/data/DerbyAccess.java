@@ -5,8 +5,12 @@ import java.sql.DatabaseMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import helpers.AppHelpers;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.DriverManager;
@@ -254,6 +258,88 @@ public class DerbyAccess {
 		} catch (SQLException e) {
 			throw new Exception("Cannot select items from table 'CHESSPLAYERS' ," + e.getMessage());
 			
+		}
+	}
+	
+	/**
+	 * @author pmelian
+	 * @param conn
+	 * @param sID
+	 * @throws Exception
+	 * @comments
+	 *          Delete the user from table 'CHESSPLAYERS' 
+	 *          Re-order TreeMap, remove ID from new TreeMap.
+	 *          Commit/persist changed TreeMap in correct order to table 'CHESSPLAYERS'
+	 */
+	public static void deleteUser(Connection conn,int sID) throws Exception {
+		ResultSet rs 								= null;
+		boolean bHasRecordSet 						= false;
+		TreeMap <Integer,Integer>tRankIdMap 	    = new TreeMap<Integer,Integer>();
+		List<Integer> idList 						= new ArrayList<Integer>();
+		PreparedStatement  pStDel 					= null;
+		PreparedStatement  pStUpdate 				= null;
+		String deleteSql 							= "DELETE FROM CHESSPLAYERS WHERE id = ?";
+		String updateSql 							= "UPDATE CHESSPLAYERS SET RANK = ? WHERE ID =?";
+		
+		try {
+			getAllTableRecords(conn);
+			rs = DerbyAccess.getResListUser();
+			while (rs.next()) {	
+				bHasRecordSet =true;
+				idList.add(rs.getInt("id"));
+				tRankIdMap.put(rs.getInt("Rank"), rs.getInt("id"));
+			}
+			
+			if(!bHasRecordSet) 			{	throw new Exception("No records exist to delete.");								}
+			if(!idList.contains(sID))	{	throw new Exception("Passed 'User System Id' does not exist in Data Base,");	}
+			
+			try {
+				pStDel = conn.prepareStatement(deleteSql);
+				pStDel.setInt(1,sID);
+				pStDel.executeUpdate();
+			}catch (SQLException x) {
+				throw new Exception("failed to delete record from Data Base," + x.getMessage());
+			}
+			
+			for (Entry<Integer, Integer> sE : AppHelpers.deleteAndReorderMap(tRankIdMap, sID).entrySet()) {
+				if(pStUpdate != null) {
+					try {
+						pStUpdate.close();
+						pStUpdate =null;
+					} catch (SQLException e1) {
+						throw new Exception("failed to close prepared statement," + e1.getMessage());
+					}
+				}
+				try {
+					pStUpdate = conn.prepareStatement(updateSql);
+					pStUpdate.setInt(1,sE.getKey());
+					pStUpdate.setInt(2,sE.getValue());
+					pStUpdate.executeUpdate();
+				}catch(SQLException e2) {
+					throw new Exception("failed to update Data Base after delete record," + e2.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			throw e;
+		}finally {
+			if(rs != null) {
+				try {
+					rs.close();
+					rs =null;
+				} catch (Throwable ignore) {}
+			}
+			if(pStDel != null) {
+				try {
+					pStDel.close();
+					pStDel =null;
+				} catch (Throwable ignore) {}
+			}
+			if(pStUpdate != null) {
+				try {
+					pStUpdate.close();
+					pStUpdate =null;
+				} catch (Throwable ignore) {}
+			}
 		}
 	}
 
