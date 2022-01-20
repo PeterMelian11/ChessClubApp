@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 
 import data.DerbyAccess;
 import helpers.AppHelpers;
+import net.proteanit.sql.DbUtils;
 
 import java.sql.Connection;
 import java.awt.event.ActionListener;
@@ -210,6 +211,18 @@ public class InitFrame {
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(frame, e1.getMessage());
 				} 
+			}
+		});
+		
+		/**List  Users event handler**/
+		btnButton_List.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					DerbyAccess.getAllTableRecords(conn);
+					table.setModel(DbUtils.resultSetToTableModel(DerbyAccess.getResListUser()));
+				} catch (Exception e) {
+					dbLabelMsg.setText(e.getMessage());
+				}
 			}
 		});
 		

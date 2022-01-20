@@ -237,7 +237,16 @@ public class DerbyAccess {
 		}
 	}
 	
-	private static void getAllTableRecords(Connection conn) throws Exception {
+	/**
+	 * @author pmelian
+	 * @param conn
+	 * @throws Exception
+	 * @comment
+	 *         Select all records in table 'CHESSPLAYERS' in Ascending order.
+	 *         Populate static Resultset with query results.
+	 *         
+	 */
+	public static void getAllTableRecords(Connection conn) throws Exception {
 		cleanUpStaticVar();
 		try {
 			staListUser = conn.createStatement();
