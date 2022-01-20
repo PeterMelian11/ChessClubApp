@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -44,6 +45,9 @@ public class InitFrame {
 			DerbyAccess.createDbTable(conn);
 			dbLabelMsg.setText("Connected to embedded Derby Data Base. (Table CHESSPLAYERS)");
 			
+			JButton btnButton_List = new JButton("List Users");
+			btnButton_List.setBounds(27, 11, 116, 23);
+			frame.getContentPane().add(btnButton_List);
 			
 			
 		} catch (Exception e) {

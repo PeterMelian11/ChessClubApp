@@ -15,7 +15,7 @@ public class DerbyAccess {
 	private static Statement staListUser 	= null;
 	private static ResultSet resListUser 	= null;
 	
-	/** Getter and Setter **/
+	/** Getters and Setters **/
 	public static Statement getStaListUser() 				 { return staListUser;	}
 	public static void setStaListUser(Statement staListUser) { DerbyAccess.staListUser = staListUser;	}
 	public static ResultSet getResListUser() 				 {	return resListUser;	}
@@ -90,7 +90,6 @@ public class DerbyAccess {
 				}
 			}
 		}
-		
 	}
 	
 	
@@ -105,7 +104,7 @@ public class DerbyAccess {
 		Connection conn				 = null;
 		try {
 			conn = DriverManager.getConnection(JDBC_URL);
-			} catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new Exception("Failed to connect to embedded Derby Data Base");
 		}
 		return conn;
