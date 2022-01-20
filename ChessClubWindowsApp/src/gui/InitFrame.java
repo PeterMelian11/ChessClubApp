@@ -240,6 +240,28 @@ public class InitFrame {
 			}
 		});
 		
+		/**Match Play **/
+		comboBoxResult.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int sID_Player1;
+				int sID_Player2;
+				String sPalyer1Result = "";
+				String resultMsg      ="";
+				try {
+					sID_Player1  = AppHelpers.isInteger("Text Box 'Player 1 ID'", (textField_MatchPlayer_1_Id.getText()).toUpperCase());
+					sID_Player2  = AppHelpers.isInteger("Text Box 'Player 2 ID'", (textField_MatchPlayer_2_Id.getText()).toUpperCase());
+					if(sID_Player1 == sID_Player2) {	throw new Exception("'Player 1 ID' cannot be the same as 'Player 2 ID'"); }
+					
+					sPalyer1Result = (String) comboBoxResult.getSelectedItem();
+					resultMsg = DerbyAccess.matchPlayEvaluate(conn,sID_Player1,sID_Player2,sPalyer1Result);
+					JOptionPane.showMessageDialog(frame,resultMsg);
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(frame, e1.getMessage());
+				} 
+				
+			}
+		});
+	
 	}
 
 	/**
